@@ -48,31 +48,23 @@ class PlantByID(Resource):
         return make_response(jsonify(plant), 200)
     
     def patch(self, id):
+        plant = Plant.query.filter_by(id=id).first()
         data = request.get_json()
-
-        specific_plant = Plant.query.filter_by(id=id).first()
-
-        for attr in specific_plant:
-            setattr(specific_plant, attr, data[attr])
-
-        db.session.add(specific_plant)
+        for attr, value in data.items():
+            setattr(plant, attr, value)
         db.session.commit()
-
-        response_dict = specific_plant.to_dict()
-
-        response = make_response(response_dict, 200)
-
+        plant_dict = plant.to_dict()
+        response = make_response(plant_dict, 200)
         return response
     
     def delete(self, id):
-        specific_plant = Plant.query.filter_by(id=id).first()
-
-        db.session.delete(specific_plant)
+        plant = Plant.query.filter_by(id=id).first()
+        db.session.delete(plant)
         db.session.commit()
-
-        response = make_response("", 204)
-
+        body = {"message": ""}
+        response = make_response(body, 204)
         return response
+
 
 api.add_resource(PlantByID, '/plants/<int:id>')
 
